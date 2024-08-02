@@ -63,7 +63,7 @@ public class DiagramFactory {
             myBlocks.add(myBlockInfo);
             totalPages = totalPages + myBlockInfo.getNbImages();
             LOG.debug("myBlockInfo done in  ", System.currentTimeMillis() - start, " ms");
-
+            // 因为我们只会生成一幅图
             break;
         }
 
@@ -120,13 +120,20 @@ public class DiagramFactory {
 
         LOG.error("numImage is too big = " + numImage);
         return null;
-    }
+    }// todo:myBlocks是什么时候赋值的
 
+    /**
+     * 将生成的图像导出到指定的输出流中
+     * @param imageStream 图像输出流，用于接收导出的图像
+     * @param numImage 要导出的图像的编号
+     * @param formatOption 图像的格式选项
+     */
     public DiagramDescription outputImage(OutputStream imageStream, int numImage, FileFormatOption formatOption) {
         try {
             for (MyBlock myBlock : myBlocks) {
-                final int nbInSystem = myBlock.getNbImages();
-                if (numImage < nbInSystem) {
+                final int nbInSystem = myBlock.getNbImages(); // 获取当前块中的图像数量
+                if (numImage < nbInSystem) { // 检查目标图像是否在当前块中
+                    // 将生成的图像导出到指定的输出流中
                     myBlock.getDiagram().exportDiagram(imageStream, numImage, formatOption);
                     return myBlock.getDiagram().getDescription();
                 }
@@ -154,7 +161,7 @@ public class DiagramFactory {
         }
         return svgBytes;
     }
-
+    // 将生成的图像导出到指定的输出流中
     @NotNull
     protected ImageItem generateImageItem(RenderRequest renderRequest,
                                           String documentSource,

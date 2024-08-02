@@ -27,8 +27,8 @@ import java.util.Objects;
 import static org.plantuml.idea.util.UIUtils.notification;
 
 /**
- * @author Max Gorbunov
- * @author Eugene Steinberg
+ * 全局设置？
+ *
  */
 @State(name = "PlantUmlSettingsNew", storages = {@Storage("plantuml.xml")})
 public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettings> {

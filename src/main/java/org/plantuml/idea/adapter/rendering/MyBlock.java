@@ -10,15 +10,15 @@ import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.RenderRequest;
 
 import java.util.List;
-
+/// 封装单幅图的信息
 public class MyBlock {
     private static final Logger LOG = Logger.getInstance(MyBlock.class);
 
     private final String fileOrDirname;
     private final Titles titles;
-    private BlockUml blockUml;
-    private int nbImages;
-    private net.sourceforge.plantuml.core.Diagram diagram;
+    private BlockUml blockUml;///源代码文件可以包含多个 UML 图，每个图表之间通过 @startuml 和 @enduml 标记来划分 BlockUml封装了从 PlantUML 源代码解析出的单个 UML 图
+    private int nbImages;// 图标总页数
+    private net.sourceforge.plantuml.core.Diagram diagram;// 它代表一个解析后的 UML 图
 
     public MyBlock(BlockUml block) {
         this.blockUml = block;

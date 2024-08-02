@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 public class PlantUmlRendererUtil {
     private static final Logger logger = Logger.getInstance(PlantUmlRendererUtil.class);
-
+    // 用于从文本中找到标记为“newpage”的位置。这些标记通常用于指示文档中的分页或分节。
     public static final Pattern NEW_PAGE_PATTERN = Pattern.compile("\\n\\s*@?(?i)(newpage)(\\p{Blank}+[^\\n]+|\\p{Blank}*)(?=\\n)");
 
     private static final PlantUmlNormalRenderer NORMAL_RENDERER = new PlantUmlNormalRenderer();
@@ -39,16 +39,17 @@ public class PlantUmlRendererUtil {
         String source = renderRequest.getSource();
         String[] sourceSplit = NEW_PAGE_PATTERN.split(source);
         logger.debug("split done ", System.currentTimeMillis() - start, "ms");
-        
+        // 检查是否为部分渲染
         boolean partialRender = sourceSplit[0].contains(LanguageDescriptor.IDEA_PARTIAL_RENDER);
         logger.debug("partialRender ", partialRender);
 
         start = System.currentTimeMillis();
         RenderResult renderResult;
         if (partialRender) {
-            //uses internal plantuml classes, must not be a field
+            //使用内部 PlantUML 类进行部分渲染
             renderResult = new PlantUmlPartialRenderer().partialRender(renderRequest, cachedItem, sourceSplit);
         } else {
+            // 使用正常的渲染器进行渲染
             renderResult = NORMAL_RENDERER.doRender(renderRequest, cachedItem, sourceSplit);
         }
         logger.debug("doRender ", System.currentTimeMillis() - start, "ms");

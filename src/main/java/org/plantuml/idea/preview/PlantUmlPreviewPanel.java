@@ -47,7 +47,7 @@ import static org.plantuml.idea.rendering.LazyApplicationPoolExecutor.Delay.RESE
  */
 public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     private static Logger logger = Logger.getInstance(PlantUmlPreviewPanel.class);
-    private static AtomicInteger sequence = new AtomicInteger();
+    private static AtomicInteger sequence = new AtomicInteger();/// 使用AtomicInteger确保在多线程情况下，每次请求都会获得一个唯一的，递增的版本号
 
     private JPanel imagesPanel;
     private JScrollPane scrollPane;
@@ -258,7 +258,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
                     return;
                 }
 
-                //todo can be simplified, because of removing of renderCache
+                //多次情况都存在提交，因此使用 synchronized，确保了 queue 的一致性
                 if (cachedItem == null) {
                     logger.debug("no cached item");
                     lazyExecutor.submit(getCommand(reason, sourceFilePath, source, selectedPage, zoom, null, delay));
@@ -269,6 +269,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
                     logger.debug("render required imageMissingOrZoomChanged");
                     lazyExecutor.submit(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, zoom, cachedItem, delay));
                 } else if (cachedItem.sourceChanged(source)) {
+                    // key: 为了避免阻塞主线程（尤其是 GUI 线程），使用线程池异步执行渲染任务
                     logger.debug("render required sourceChanged");
                     lazyExecutor.submit(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, zoom, cachedItem, RESET_DELAY));
                 } else if (!isDisplayed(cachedItem, selectedPage, displayedItem)) {
@@ -286,7 +287,8 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         };
 
         int i = myAlarm.cancelAllRequests();
-        myAlarm.addRequest(Utils.logDuration("EDT processRequest", renderRunnable), delay == NOW ? 0 : 10);
+        // Utils.logDuration 方法的返回值通常是一个包装过的 Runnable，该 Runnable 在执行时会记录任务的开始和结束时间，并计算总持续时间。
+        myAlarm.addRequest(Utils.logDuration("EDT processRequest", renderRunnable), delay == NOW ? 0 : 10);//任务将在 10 毫秒后执行
     }
 
     @Nullable
@@ -319,7 +321,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     private boolean isDisplayed(RenderCacheItem cachedItem, int page, RenderCacheItem displayedItem) {
         return displayedItem == cachedItem && cachedItem.getRequestedPage() == page;
     }
-
+    /// 每次渲染请求会被包装成一个对象，对象会包含本次渲染的各种信息，以及版本号
     @NotNull
     private RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, final int page, final Zoom zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
         logger.debug("#getCommand selectedFile='", selectedFile, "', page=", page, ", scaledZoom=", zoom);
@@ -552,7 +554,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     }
 
     /**
-     * @see ImageItem#initImage(Project, RenderRequest, RenderResult, PlantUmlPreviewPanel)
+     * @see ImageItem# initImage(Project, RenderRequest, RenderResult, PlantUmlPreviewPanel)
      */
     @NotNull
     private JComponent createImageContainer(RenderCacheItem cacheItem, int pageNumber, ImageItem imageWithData) {

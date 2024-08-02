@@ -33,7 +33,7 @@ public class Utils {
         long start = System.currentTimeMillis();
         File baseDir = UIUtils.getParent(new File(sourceFilePath));
         if (baseDir != null) {
-            setPlantUmlDir(baseDir);
+            setPlantUmlDir(baseDir); // 父目录不为空则设置 PlantUML 的目录为 baseDir
         } else {
             resetPlantUmlDir();
         }

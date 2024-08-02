@@ -13,6 +13,7 @@ import org.plantuml.idea.preview.Zoom;
 import org.plantuml.idea.settings.PlantUmlSettings;
 
 import javax.swing.*;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -22,25 +23,90 @@ import static org.plantuml.idea.util.Utils.logDuration;
 public class RenderCommand {
     public static final Logger logger = Logger.getInstance(RenderCommand.class);
 
+    /**
+     * 包含所有需要渲染的目标面板 PlantUmlPreviewPanel，天然去重
+     */
     private final Set<PlantUmlPreviewPanel> targets = new CopyOnWriteArraySet<>();
+
+    /**
+     * 当前项目
+     */
     private final Project project;
+
+    /**
+     * 触发这个渲染命令的原因（如：源代码变更、页面缩放等）
+     */
     protected Reason reason;
+
+    /**
+     * 源文件的路径
+     */
     protected String sourceFilePath;
+
+    /**
+     * PlantUML 源代码内容
+     */
     protected final String source;
+
+    /**
+     * 需要渲染的页面编号
+     */
     protected final int page;
+
+    /**
+     * 表示渲染时的缩放级别
+     */
     protected Zoom zoom;
+
+    /**
+     * 缓存的渲染结果，用于提高渲染性能
+     */
     protected RenderCacheItem cachedItem;
+
+    /**
+     * 命令的版本号，用于比较命令的新旧
+     */
     protected int version;
+
+    /**
+     * 指定命令的执行延迟策略（如：立即执行、延迟执行等）
+     */
     protected LazyApplicationPoolExecutor.Delay delay;
+
+    /**
+     * 当前命令的执行状态（如：等待中、执行中等）
+     */
     private ExecutionStatusPanel.State currentState = ExecutionStatusPanel.State.WAITING;
+
+    /**
+     * 计划开始时间 默认是：当前时间 + 100毫秒
+     */
     protected long startAtNanos;
+
+    /**
+     * 渲染请求
+     */
     protected RenderRequest renderRequest;
+
+    /**
+     * 存储渲染的结果，使用 volatile 修饰以确保线程可见性
+     */
     protected volatile RenderResult result;
     protected static final int MILLION = 1000000;
+
+    /**
+     * 记录命令开始执行的时间戳
+     */
     protected long start;
+
+    /**
+     * 新的渲染缓存项，用于存储最新的渲染结果。
+     */
     protected volatile RenderCacheItem newRenderCacheItem;
 
     public long getRemainingDelayMillis() {
+        // 纳秒转毫秒 -> 1毫秒 = 1,000,000纳秒
+        //        计划开始时间 - 当前时间
         return (startAtNanos - System.nanoTime()) / MILLION;
     }
 
@@ -73,7 +139,9 @@ public class RenderCommand {
         return this.targets.containsAll(targets);
     }
 
-
+    /**
+     * 如果现有命令 command 可以添加新命令 newCommand 的目标,则将新目标合并到现有命令 command 中。
+     */
     public synchronized boolean addTargetsIfPossible_blocking(RenderCommand newCommand) {
         if (result == null) {
             logger.debug("adding targets ", newCommand.getTargets(), " to ", this);
@@ -224,12 +292,12 @@ public class RenderCommand {
         RenderCommand that = (RenderCommand) o;
 
         if (page != that.page) return false;
-        if (project != null ? !project.equals(that.project) : that.project != null) return false;
+        if (!Objects.equals(project, that.project)) return false;
         if (reason != that.reason) return false;
-        if (sourceFilePath != null ? !sourceFilePath.equals(that.sourceFilePath) : that.sourceFilePath != null)
+        if (!Objects.equals(sourceFilePath, that.sourceFilePath))
             return false;
-        if (source != null ? !source.equals(that.source) : that.source != null) return false;
-        if (zoom != null ? !zoom.equals(that.zoom) : that.zoom != null) return false;
+        if (!Objects.equals(source, that.source)) return false;
+        if (!Objects.equals(zoom, that.zoom)) return false;
         return true;
     }
 

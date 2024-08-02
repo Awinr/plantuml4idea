@@ -55,7 +55,7 @@ public class ImageItem {
     private final String documentSource;
     private final byte[] imageBytes;
     private Throwable exception;
-
+    /// 存放预览面板和图像组件的map
     private final Map<PlantUmlPreviewPanel, ImageItemComponent> componentMap = new HashMap<>();
     private BufferedImage bufferedImage;
 
@@ -177,8 +177,8 @@ public class ImageItem {
         return false;
     }
 
-    /**
-     * @see PlantUmlPreviewPanel#createImageContainer(RenderCacheItem, int, ImageItem)
+    /** 初始化图像项目组件 ImageItemComponent
+     * @see PlantUmlPreviewPanel # createImageContainer(RenderCacheItem, int, ImageItem)
      */
     ImageItemComponent initImage(Project project, RenderRequest renderRequest, RenderResult renderResult, PlantUmlPreviewPanel previewPanel) {
         ImageItemComponent imageItemComponent = getImageItemComponent(previewPanel);

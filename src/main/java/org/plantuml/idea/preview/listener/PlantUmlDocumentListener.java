@@ -29,7 +29,7 @@ public class PlantUmlDocumentListener implements DocumentListener {
     @Override
     public void beforeDocumentChange(DocumentEvent event) {
     }
-
+    // 监听文件变更
     @Override
     public void documentChanged(DocumentEvent event) {
         VirtualFile file = instance.getFile(event.getDocument());

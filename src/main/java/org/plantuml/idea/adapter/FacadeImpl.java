@@ -89,7 +89,7 @@ public class FacadeImpl implements PlantUmlFacade {
     public RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
         if (PlantUmlSettings.getInstance().isRemoteRendering()) {
             return RemoteRenderer.render(renderRequest);
-        } else {
+        } else {// 谁没事远程渲染啊
             return PlantUmlRendererUtil.render(renderRequest, cachedItem);
         }
     }

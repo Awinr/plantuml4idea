@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.PlantIUmlFileType;
@@ -124,7 +125,8 @@ public class Utils {
         }
     }
 
-    public static Runnable logDuration(final String name, Runnable r) {
+    @Contract(pure = true)
+    public static @NotNull Runnable logDuration(final String name, Runnable r) {
         return () -> {
             long start = System.currentTimeMillis();
             try {
